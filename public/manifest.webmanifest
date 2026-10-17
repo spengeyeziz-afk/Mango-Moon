@@ -5,7 +5,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "landscape",
   "background_color": "#14302e",
   "theme_color": "#14302e",
   "description": "A Jamaican cove of mango, jam, wine, and Bonnet Cay.",

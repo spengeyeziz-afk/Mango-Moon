@@ -19,3 +19,17 @@ export function hideBanner() {
 export function showInterstitial() {
   // Reserved for an AdMob interstitial between islands or after a quest. Do not call it on a timer.
 }
+
+/** Reward a finished rewarded-ad view would pay. Do not grant this unless showRewardedAd resolves completed. */
+export const REWARDED_AD = { stones: 2, coins: 50 }
+
+/**
+ * Placeholder for a future AdMob rewarded ad.
+ * Returns completed: false until a Play build actually shows an ad and the viewer finishes it.
+ */
+export function showRewardedAd(): Promise<{ completed: boolean; reason?: string }> {
+  return Promise.resolve({
+    completed: false,
+    reason: "Rewarded ads are not connected on this build yet.",
+  })
+}

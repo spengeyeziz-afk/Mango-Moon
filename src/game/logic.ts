@@ -239,6 +239,8 @@ export function freshSave(now = Date.now()): Save {
     tideAt: now + 45_000,
     tideReady: false,
     hasPlayed: false,
+    giftClaimed: false,
+    dailyAt: 0,
     settings: { music: true, sfx: true, motion: true },
     keeper: { ...KEEPER_START },
     ownedOffers: [],
@@ -316,6 +318,8 @@ export function normalize(raw: unknown): Save {
     tideAt: num(p.tideAt, base.tideAt),
     tideReady: Boolean(p.tideReady),
     hasPlayed: Boolean(p.hasPlayed),
+    giftClaimed: typeof p.giftClaimed === "boolean" ? p.giftClaimed : Boolean(p.hasPlayed),
+    dailyAt: num(p.dailyAt, 0),
     settings: {
       music: p.settings?.music !== false,
       sfx: p.settings?.sfx !== false,
@@ -827,9 +831,39 @@ export function saveKeys(s: Save): Save {
     tideAt: s.tideAt,
     tideReady: s.tideReady,
     hasPlayed: s.hasPlayed,
+    giftClaimed: s.giftClaimed,
+    dailyAt: s.dailyAt,
     settings: s.settings,
     keeper: s.keeper,
     ownedOffers: s.ownedOffers,
     yard: s.yard,
   }
+}
+
+export const DAY_MS = 24 * 60 * 60 * 1000
+
+export function claimWelcome(save: Save, _now: number): Act {
+  const s = copySave(save)
+  if (s.giftClaimed) return { ok: false, reason: "That gift is already open." }
+  s.giftClaimed = true
+  s.stones += 5
+  s.coins += 150
+  return { ok: true, save: s, note: "Gift claimed. 5 moonstones and 150 coins." }
+}
+
+export function claimDaily(save: Save, now: number): Act {
+  const s = copySave(save)
+  if (s.dailyAt > 0 && now < s.dailyAt + DAY_MS) return { ok: false, reason: "The next daily gift opens tomorrow." }
+  s.dailyAt = now
+  s.stones += 1
+  s.coins += 50
+  return { ok: true, save: s, note: "Daily gift. 1 moonstone and 50 coins." }
+}
+
+/** Only call after a rewarded ad actually finishes. */
+export function grantRewarded(save: Save, _now: number): Act {
+  const s = copySave(save)
+  s.stones += 2
+  s.coins += 50
+  return { ok: true, save: s, note: "Ad reward. 2 moonstones and 50 coins." }
 }

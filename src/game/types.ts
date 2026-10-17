@@ -145,6 +145,8 @@ export type Save = {
   tideAt: number
   tideReady: boolean
   hasPlayed: boolean
+  giftClaimed: boolean
+  dailyAt: number
   settings: Settings
   keeper: { x: number; y: number }
   ownedOffers: string[]

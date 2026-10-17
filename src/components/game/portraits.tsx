@@ -5,6 +5,9 @@ import type { AvatarId } from "@/game/types"
 
 export function Portrait({ look, className }: { look: Look; className?: string }) {
   const clip = useId()
+  if (look.photo) {
+    return <img src={look.photo} alt="" className={`${className ?? "face"} photo-face`} />
+  }
   return (
     <svg viewBox="0 0 80 80" className={className ?? "face"} aria-hidden="true">
       <defs>
@@ -73,6 +76,9 @@ function HairBack({ look }: { look: Look }) {
 }
 
 export function Walker({ look }: { look: Look }) {
+  if (look.photo) {
+    return <img src={look.photo} alt="" className="sprite-img photo-walker" />
+  }
   return (
     <svg viewBox="0 0 80 150" className="sprite-img sway" aria-hidden="true">
       <ellipse cx="40" cy="142" rx="18" ry="5" fill="#14302e" opacity="0.18" />

@@ -1,11 +1,12 @@
 import { useEffect } from "react"
 import { BookOpen, ListChecks, Settings, Ship, Store } from "lucide-react"
 import { IconCoin, IconMoon, IconStone, IconSun } from "@/components/game/art"
-import { Island } from "@/components/game/Island"
+import { Stage } from "@/components/game/Stage"
 import { AvatarPicker } from "@/components/game/portraits"
 import { Sheets } from "@/components/game/Sheets"
-import { activeQuest, energyCap, formatLeft, helpSteps, levelInfo } from "@/game/content"
+import { activeQuest, energyCap, formatLeft, levelInfo } from "@/game/content"
 import { initAds } from "@/game/ads"
+import { DAY_MS } from "@/game/logic"
 import { nextEnergyMs } from "@/game/logic"
 import { useGame } from "@/game/store"
 
@@ -68,10 +69,13 @@ export function Game() {
 
   return (
     <main className="game">
-      <Island interactive={screen === "play"} />
+      {screen === "play" ? <Stage /> : null}
+      {screen === "title" ? <div className="title-bg" /> : null}
       {screen === "play" ? <Hud /> : <Title />}
       {screen === "play" ? <Dock /> : null}
+      <p className="turn-hint">Turn the phone sideways for the full island.</p>
       <Toasts />
+      <Gift />
       <Sheets />
     </main>
   )
@@ -85,11 +89,9 @@ function Title() {
   const setSetting = useGame((s) => s.setSetting)
   return (
     <section className="title-card">
-      <p className="eyebrow">Marva's Cove, Jamaica</p>
-      <h1>Mango Moon</h1>
-      <p className="lede">
-        Grow the grove, cook with Granny Marva, then ferry to Bonnet Cay for chickens, eggs, fish, and jerk.
-      </p>
+      <p className="eyebrow">Welcome to Mango Moon</p>
+      <h1>Marva's Cove, Jamaica</h1>
+      <p className="lede">Grow the grove, cook with Granny Marva, then ferry to Bonnet Cay.</p>
       <p className="section-label">Who is walking</p>
       <AvatarPicker />
       <button type="button" className="btn btn-primary" data-testid="start" onClick={() => begin()}>
@@ -102,11 +104,6 @@ function Title() {
         <span>Music</span>
         <i data-on={music ? "1" : "0"} />
       </button>
-      <ol className="title-steps">
-        {helpSteps().map((s) => (
-          <li key={s.title}>{s.title}</li>
-        ))}
-      </ol>
       <p className="legal-links">
         <button type="button" onClick={() => open({ type: "about" })}>About</button>
         <button type="button" onClick={() => open({ type: "privacy" })}>Privacy</button>
@@ -119,12 +116,13 @@ function Title() {
 function Hud() {
   const save = useGame()
   const open = useGame((s) => s.open)
+  const daily = useGame((s) => s.doDaily)
+  const watchAd = useGame((s) => s.doWatchAd)
   const info = levelInfo(save.xp)
   const cap = energyCap(save.xp)
   const quest = activeQuest(save)
   const wait = nextEnergyMs(save, save.now)
-  const place = useGame((s) => s.doPlace)
-  const onCay = save.yard.place === "cay"
+  const dailyReady = save.dailyAt === 0 || save.now >= save.dailyAt + DAY_MS
   return (
     <>
       <header className="hud">
@@ -138,8 +136,11 @@ function Hud() {
           <span className="num">{save.energy}</span>
           <small>{save.energy >= cap ? "Full" : formatLeft(wait)}</small>
         </button>
-        <button type="button" className="pill" data-testid="ferry-toggle" onClick={() => place(onCay ? "cove" : "cay")}>
-          {onCay ? "Cove" : "Cay"}
+        <button type="button" className="pill" data-testid="daily-gift" onClick={() => daily()}>
+          {dailyReady ? "Daily gift" : "Tomorrow"}
+        </button>
+        <button type="button" className="pill" data-testid="watch-ad" onClick={() => watchAd()}>
+          Watch ad
         </button>
         <button type="button" className="pill pill-money" data-testid="open-shop" onClick={() => open({ type: "shop" })}>
           <span className="coin"><IconCoin /><b className="num">{save.coins.toLocaleString("en-US")}</b></span>
@@ -175,6 +176,25 @@ function Toasts() {
       {toasts.map((t) => (
         <p key={t.id} className="toast">{t.text}</p>
       ))}
+    </div>
+  )
+}
+
+function Gift() {
+  const screen = useGame((s) => s.ui.screen)
+  const claimed = useGame((s) => s.giftClaimed)
+  const claim = useGame((s) => s.doGift)
+  if (screen !== "play" || claimed) return null
+  return (
+    <div className="gift-layer" role="dialog" aria-label="Welcome gift">
+      <div className="gift-card">
+        <p className="gift-emoji" aria-hidden="true">🎁 🎁 🎁</p>
+        <h2>Your gift awaits! Claim now</h2>
+        <p>5 moonstones and 150 coins, for your first step ashore.</p>
+        <button type="button" className="btn btn-primary" data-testid="claim-gift" onClick={() => claim()}>
+          Claim now
+        </button>
+      </div>
     </div>
   )
 }

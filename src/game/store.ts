@@ -41,7 +41,11 @@ import {
   unlockRod,
   uproot,
   claimOne,
+  claimWelcome,
+  claimDaily,
+  grantRewarded,
 } from "@/game/logic"
+import { showRewardedAd } from "@/game/ads"
 import { claimYard, settleYard, YARD_SELL } from "@/game/yard"
 
 type YardGood = keyof typeof YARD_SELL
@@ -90,6 +94,9 @@ type Store = Save & {
   doJerk: () => void
   doServe: () => void
   doSellYard: (kind: YardGood, qty: number) => void
+  doGift: () => void
+  doDaily: () => void
+  doWatchAd: () => void
 }
 
 const memory = new Map<string, string>()
@@ -223,6 +230,20 @@ export const useGame = create<Store>()(
         doJerk: () => run(makeJerk(saveKeys(get()), Date.now())),
         doServe: () => run(serveBeach(saveKeys(get()), Date.now()), "coin"),
         doSellYard: (kind, qty) => run(sellYard(saveKeys(get()), kind, qty, Date.now()), "coin"),
+        doGift: () => run(claimWelcome(saveKeys(get()), Date.now()), "coin"),
+        doDaily: () => run(claimDaily(saveKeys(get()), Date.now()), "coin"),
+        doWatchAd: () => {
+          void (async () => {
+            const ad = await showRewardedAd()
+            const now = Date.now()
+            if (!ad.completed) {
+              audio.bad()
+              set((s) => ({ toasts: push(s.toasts, ad.reason ?? "Ad not ready.", now), now }))
+              return
+            }
+            run(grantRewarded(saveKeys(get()), now), "coin")
+          })()
+        },
       }
     },
     {
