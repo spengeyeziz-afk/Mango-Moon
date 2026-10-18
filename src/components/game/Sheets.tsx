@@ -462,14 +462,6 @@ function Book() {
       <h2>Cove book</h2>
       <div className="people">
         <figure>
-          <img src="/art/granny.png" alt="" />
-          <figcaption>
-            <strong>Granny Marva</strong>
-            <small>Press and cellar</small>
-            <small>Mixed-race Jamaican. Jam this morning, wine for years.</small>
-          </figcaption>
-        </figure>
-        <figure>
           <Portrait look={playerLook(save.yard.avatar)} className="book-face" />
           <figcaption>
             <strong>{playerLook(save.yard.avatar).name}</strong>

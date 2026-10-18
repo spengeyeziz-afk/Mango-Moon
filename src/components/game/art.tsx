@@ -317,7 +317,8 @@ function Boat() {
 }
 
 export function Person({ who }: { who: "granny" | "keeper" }) {
-  return <img src={who === "granny" ? "/art/granny.png" : "/art/keeper.png"} alt="" className="sprite-img sway" />
+  const src = who === "granny" ? "/art/look/marva.png" : "/art/look/kian.png"
+  return <img src={src} alt="" className="photo-face person-shot" />
 }
 
 export function Ground() {

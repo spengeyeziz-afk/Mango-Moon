@@ -73,7 +73,6 @@ export function Game() {
       {screen === "title" ? <div className="title-bg" /> : null}
       {screen === "play" ? <Hud /> : <Title />}
       {screen === "play" ? <Dock /> : null}
-      <p className="turn-hint">Turn the phone sideways for the full island.</p>
       <Toasts />
       <Gift />
       <Sheets />
