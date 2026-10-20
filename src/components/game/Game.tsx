@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { BookOpen, ListChecks, Settings, Ship, Store } from "lucide-react"
 import { IconCoin, IconMoon, IconStone, IconSun } from "@/components/game/art"
-import { Stage } from "@/components/game/Stage"
+import { Island } from "@/components/game/Island"
 import { AvatarPicker } from "@/components/game/portraits"
 import { Sheets } from "@/components/game/Sheets"
 import { activeQuest, energyCap, formatLeft, levelInfo } from "@/game/content"
@@ -69,7 +69,7 @@ export function Game() {
 
   return (
     <main className="game">
-      {screen === "play" ? <Stage /> : null}
+      {screen === "play" ? <Island interactive /> : null}
       {screen === "title" ? <div className="title-bg" /> : null}
       {screen === "play" ? <Hud /> : <Title />}
       {screen === "play" ? <Dock /> : null}

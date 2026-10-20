@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react"
-import { BuildingArt, Ground, Person, TreeArt } from "@/components/game/art"
+import { BuildingArt, Ground, TreeArt } from "@/components/game/art"
 import { CayGround, CayHits } from "@/components/game/CayIsland"
 import { Walker } from "@/components/game/portraits"
 import { playerLook } from "@/game/people"
@@ -43,10 +43,10 @@ export function Island({ interactive }: { interactive: boolean }) {
   useLayoutEffect(() => {
     const vp = ref.current
     if (!vp) return
-    const fit = Math.min(vp.clientWidth / WORLD.w, vp.clientHeight / WORLD.h)
-    cam.current.s = Math.min(1.15, Math.max(0.42, fit * 1.55))
-    cam.current.x = vp.clientWidth / 2 - 400 * cam.current.s
-    cam.current.y = vp.clientHeight / 2 - 380 * cam.current.s
+    const fit = Math.min(vp.clientWidth / WORLD.w, (vp.clientHeight - 8) / WORLD.h)
+    cam.current.s = Math.min(1.2, Math.max(0.28, fit))
+    cam.current.x = (vp.clientWidth - WORLD.w * cam.current.s) / 2
+    cam.current.y = (vp.clientHeight - WORLD.h * cam.current.s) / 2
     apply()
   }, [])
 
@@ -276,9 +276,16 @@ function Hits() {
     key: "granny",
     y: GRANNY.y,
     node: (
-      <div className="actor" style={{ left: GRANNY.x, top: GRANNY.y }} aria-hidden="true">
-        <Person who="granny" />
-      </div>
+      <button
+        type="button"
+        className="hit hit-lg"
+        style={{ left: GRANNY.x, top: GRANNY.y }}
+        aria-label="Granny Marva"
+        onClick={() => open({ type: "station", id: "press" })}
+      >
+        <img src="/art/look/marva.png" alt="" className="granny-face" />
+        <span className="nameplate">Granny Marva</span>
+      </button>
     ),
   })
   entities.push({

@@ -104,6 +104,61 @@
   object-fit: cover;
   display: block;
 }
+.atmosphere { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.cloud {
+  position: absolute;
+  height: 26px;
+  width: 88px;
+  border-radius: 40px;
+  background: rgb(255 255 255 / 78%);
+  animation: cloud-run 48s linear infinite;
+}
+.cloud::before, .cloud::after {
+  content: "";
+  position: absolute;
+  background: rgb(255 255 255 / 80%);
+  border-radius: 50%;
+}
+.cloud::before { width: 34px; height: 34px; top: -16px; left: 16px; }
+.cloud::after { width: 22px; height: 22px; top: -8px; left: 42px; }
+.cloud.c1 { top: 7%; left: -15%; }
+.cloud.c2 { top: 14%; left: 28%; animation-duration: 64s; scale: 0.75; }
+.cloud.c3 { top: 5%; left: 58%; animation-duration: 56s; }
+.waves {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: 0;
+  height: 26%;
+  background: repeating-linear-gradient(105deg, transparent 0 14px, rgb(255 255 255 / 22%) 14px 22px, transparent 22px 40px);
+  animation: sea-slide 7s linear infinite;
+}
+.shimmer {
+  position: absolute;
+  left: 6%;
+  bottom: 10%;
+  width: 46%;
+  height: 16%;
+  background: radial-gradient(ellipse at 40% 50%, rgb(255 255 255 / 30%), transparent 62%);
+  animation: glint 5.5s ease-in-out infinite;
+}
+.gull {
+  position: absolute;
+  width: 16px;
+  height: 6px;
+  border-radius: 50% 50% 40% 40%;
+  border: 2px solid rgb(255 255 255 / 80%);
+  border-bottom: 0;
+  animation: cloud-run 28s linear infinite;
+}
+.gull.g1 { top: 18%; left: -10%; }
+.gull.g2 { top: 24%; left: 10%; animation-duration: 36s; }
+.sheet-body, .people figcaption { overflow-wrap: anywhere; }
+html[data-motion="off"] .cloud,
+html[data-motion="off"] .waves,
+html[data-motion="off"] .shimmer,
+html[data-motion="off"] .gull { animation: none; }
+
 .hit, .actor {
   position: absolute;
   transform: translate(-50%, -92%);
@@ -872,19 +927,35 @@ html[data-motion="off"] .title-bg,
 html[data-motion="off"] .atmo-cloud,
 html[data-motion="off"] .atmo-sea,
 html[data-motion="off"] .atmo-glint,
-html[data-motion="off"] .atmo-palm { animation: none; }
-@media (orientation: portrait) {
-  .boot,
-  .game {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100dvh;
-    height: 100dvw;
-    min-height: 0;
-    transform-origin: top left;
-    transform: rotate(90deg) translateY(-100%);
-  }
+html[data-motion="off"] .atmo-palm,
+html[data-motion="off"] .sprite-img.sway,
+html[data-motion="off"] .keeper .photo-walker { animation: none; }
+.granny-face {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 16%;
+  border: 3px solid #fffaf3;
+  display: block;
+  background: #efe4d4;
+  box-shadow: 0 8px 16px rgb(0 0 0 / 25%);
+}
+.sprite-img.sway {
+  transform-origin: 50% 100%;
+  animation: tree-sway 3.6s ease-in-out infinite;
+}
+.keeper .photo-walker,
+.keeper .sprite-img {
+  animation: walker-bob 1.5s ease-in-out infinite;
+}
+@keyframes tree-sway {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50% { transform: rotate(2.4deg); }
+}
+@keyframes walker-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 .gift-layer {
   position: absolute;
