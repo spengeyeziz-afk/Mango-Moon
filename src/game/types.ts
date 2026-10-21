@@ -147,6 +147,8 @@ export type Save = {
   hasPlayed: boolean
   giftClaimed: boolean
   dailyAt: number
+  adDay: number
+  adsToday: number
   settings: Settings
   keeper: { x: number; y: number }
   ownedOffers: string[]

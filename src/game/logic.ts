@@ -241,6 +241,8 @@ export function freshSave(now = Date.now()): Save {
     hasPlayed: false,
     giftClaimed: false,
     dailyAt: 0,
+    adDay: 0,
+    adsToday: 0,
     settings: { music: true, sfx: true, motion: true },
     keeper: { ...KEEPER_START },
     ownedOffers: [],
@@ -320,6 +322,8 @@ export function normalize(raw: unknown): Save {
     hasPlayed: Boolean(p.hasPlayed),
     giftClaimed: typeof p.giftClaimed === "boolean" ? p.giftClaimed : Boolean(p.hasPlayed),
     dailyAt: num(p.dailyAt, 0),
+    adDay: num(p.adDay, 0),
+    adsToday: num(p.adsToday, 0),
     settings: {
       music: p.settings?.music !== false,
       sfx: p.settings?.sfx !== false,
@@ -833,6 +837,8 @@ export function saveKeys(s: Save): Save {
     hasPlayed: s.hasPlayed,
     giftClaimed: s.giftClaimed,
     dailyAt: s.dailyAt,
+    adDay: s.adDay,
+    adsToday: s.adsToday,
     settings: s.settings,
     keeper: s.keeper,
     ownedOffers: s.ownedOffers,
@@ -860,10 +866,33 @@ export function claimDaily(save: Save, now: number): Act {
   return { ok: true, save: s, note: "Daily gift. 1 moonstone and 50 coins." }
 }
 
-/** Only call after a rewarded ad actually finishes. */
-export function grantRewarded(save: Save, _now: number): Act {
+/** Only call after a rewarded ad actually finishes. Tokens are moonstones. */
+export const TOKEN_AD_REWARD = 50
+export const TOKEN_AD_LIMIT = 4
+const TOKEN_LIMIT = "You've reached today's free token limit. Come back tomorrow or visit the Token Shop."
+
+export function adDayKey(now: number) {
+  const d = new Date(now)
+  return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate()
+}
+
+export function adsUsedToday(save: Save, now: number) {
+  return save.adDay === adDayKey(now) ? save.adsToday : 0
+}
+
+export function grantTokenAd(save: Save, now: number): Act {
   const s = copySave(save)
-  s.stones += 2
-  s.coins += 50
-  return { ok: true, save: s, note: "Ad reward. 2 moonstones and 50 coins." }
+  const day = adDayKey(now)
+  if (s.adDay !== day) {
+    s.adDay = day
+    s.adsToday = 0
+  }
+  if (s.adsToday >= TOKEN_AD_LIMIT) return { ok: false, reason: TOKEN_LIMIT }
+  s.adsToday += 1
+  s.stones += TOKEN_AD_REWARD
+  return { ok: true, save: s, note: "+50 Tokens earned! Enjoy your day." }
+}
+
+export function grantRewarded(save: Save, now: number): Act {
+  return grantTokenAd(save, now)
 }

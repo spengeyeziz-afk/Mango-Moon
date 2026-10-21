@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { ItemGlyph, Person } from "@/components/game/art"
 import { AvatarPicker, Portrait } from "@/components/game/portraits"
 import { GUESTS, guestLook, playerLook } from "@/game/people"
@@ -23,7 +24,7 @@ import {
   stationHint,
   stationOpen,
 } from "@/game/content"
-import { jobReady, nextEnergyMs, wineFrac, wineStage } from "@/game/logic"
+import { adDayKey, jobReady, nextEnergyMs, wineFrac, wineStage } from "@/game/logic"
 import { useGame } from "@/game/store"
 import type { ItemId, Save, StationId } from "@/game/types"
 import {
@@ -497,10 +498,57 @@ function Book() {
   )
 }
 
+export function TokenAsk({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const watch = useGame((s) => s.doWatchAd)
+  if (!open) return null
+  return (
+    <div className="ask-layer" role="dialog" aria-labelledby="earn-title">
+      <div className="ask-card">
+        <h3 id="earn-title">Earn Free Tokens</h3>
+        <p>Watch a short video to receive 50 Tokens?</p>
+        <div className="ask-actions">
+          <button type="button" className="btn" onClick={onClose}>Cancel</button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              onClose()
+              watch()
+            }}
+          >
+            Watch
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Shop() {
+  const [ask, setAsk] = useState(false)
+  const used = useGame((s) => (s.adDay === adDayKey(s.now) ? s.adsToday : 0))
   return (
     <>
       <h2>Moon stall</h2>
+      <section className="earn-card">
+        <h3>Earn Free Tokens</h3>
+        <p>Watch a short test ad for 50 tokens. {Math.max(0, 4 - used)} free today.</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          data-testid="watch-ad-tokens"
+          onClick={() => {
+            if (used >= 4) {
+              useGame.getState().doWatchAd()
+              return
+            }
+            setAsk(true)
+          }}
+        >
+          Watch Ad for Tokens
+        </button>
+      </section>
+      <TokenAsk open={ask} onClose={() => setAsk(false)} />
       <p className="muted">
         PayHere takes the payment on their page. This game does not add moonstones or coins from a button. A pack is added only after PayHere confirms the payment, which this preview cannot see.
       </p>

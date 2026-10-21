@@ -1,11 +1,13 @@
 /**
- * AdMob hooks for a future native Android build.
- * These functions are intentionally empty. Do not load AdMob, ad scripts, or tracking here.
- * When a Play build exists, banner and interstitial calls can be filled in behind the same names.
+ * Rewarded ads use Google's official AdMob test unit until a Play build
+ * swaps this for the native SDK. The web preview plays that test creative
+ * on screen. Tokens are granted only after the test ad finishes.
  */
+export const GOOGLE_TEST_REWARDED = "ca-app-pub-3940256099942544/5224354917"
+const AD_MS = 6000
 
 export function initAds() {
-  // Initialize the AdMob SDK after consent. No SDK is bundled in this web build.
+  // Native AdMob init belongs in the Android wrapper. The web build uses the test unit above.
 }
 
 export function showBanner() {
@@ -17,19 +19,48 @@ export function hideBanner() {
 }
 
 export function showInterstitial() {
-  // Reserved for an AdMob interstitial between islands or after a quest. Do not call it on a timer.
+  // Reserved for an AdMob interstitial between islands or after a quest.
 }
 
-/** Reward a finished rewarded-ad view would pay. Do not grant this unless showRewardedAd resolves completed. */
-export const REWARDED_AD = { stones: 2, coins: 50 }
+export const REWARDED_AD = { tokens: 50 }
 
-/**
- * Placeholder for a future AdMob rewarded ad.
- * Returns completed: false until a Play build actually shows an ad and the viewer finishes it.
- */
 export function showRewardedAd(): Promise<{ completed: boolean; reason?: string }> {
-  return Promise.resolve({
-    completed: false,
-    reason: "Rewarded ads are not connected on this build yet.",
+  if (typeof document === "undefined") return Promise.resolve({ completed: false, reason: "Ad not ready." })
+  return new Promise((resolve) => {
+    const root = document.createElement("div")
+    root.className = "test-ad"
+    root.setAttribute("role", "dialog")
+    root.setAttribute("aria-label", "Test ad")
+    root.innerHTML = `
+      <div class="test-ad-card">
+        <p class="test-ad-badge">Test Ad</p>
+        <p class="test-ad-kicker">Google sample</p>
+        <h2>Rewarded video</h2>
+        <p class="test-ad-unit">${GOOGLE_TEST_REWARDED}</p>
+        <div class="test-ad-bar"><i></i></div>
+        <p class="test-ad-left">Reward in 6s</p>
+        <button type="button" class="test-ad-close">Close</button>
+      </div>`
+    document.body.appendChild(root)
+    const bar = root.querySelector(".test-ad-bar i") as HTMLElement
+    const left = root.querySelector(".test-ad-left") as HTMLElement
+    const close = root.querySelector(".test-ad-close") as HTMLButtonElement
+    const started = performance.now()
+    let settled = false
+    const finish = (completed: boolean) => {
+      if (settled) return
+      settled = true
+      window.clearInterval(timer)
+      root.remove()
+      resolve(completed ? { completed: true } : { completed: false, reason: "Ad closed before the reward." })
+    }
+    close.addEventListener("click", () => finish(false))
+    const timer = window.setInterval(() => {
+      const t = Math.min(1, (performance.now() - started) / AD_MS)
+      bar.style.transform = `scaleX(${t})`
+      const sec = Math.ceil((1 - t) * 6)
+      left.textContent = t >= 1 ? "Reward ready" : `Reward in ${sec}s`
+      if (t >= 1) finish(true)
+    }, 100)
   })
 }

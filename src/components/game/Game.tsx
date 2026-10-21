@@ -1,9 +1,9 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { BookOpen, ListChecks, Settings, Ship, Store } from "lucide-react"
 import { IconCoin, IconMoon, IconStone, IconSun } from "@/components/game/art"
 import { Island } from "@/components/game/Island"
 import { AvatarPicker } from "@/components/game/portraits"
-import { Sheets } from "@/components/game/Sheets"
+import { Sheets, TokenAsk } from "@/components/game/Sheets"
 import { activeQuest, energyCap, formatLeft, levelInfo } from "@/game/content"
 import { initAds } from "@/game/ads"
 import { DAY_MS } from "@/game/logic"
@@ -116,40 +116,48 @@ function Hud() {
   const save = useGame()
   const open = useGame((s) => s.open)
   const daily = useGame((s) => s.doDaily)
-  const watchAd = useGame((s) => s.doWatchAd)
   const info = levelInfo(save.xp)
   const cap = energyCap(save.xp)
   const quest = activeQuest(save)
   const wait = nextEnergyMs(save, save.now)
   const dailyReady = save.dailyAt === 0 || save.now >= save.dailyAt + DAY_MS
+  const [ask, setAsk] = useState(false)
   return (
     <>
       <header className="hud">
-        <button type="button" className="pill" onClick={() => open({ type: "level" })}>
-          <IconMoon />
-          <span className="num">{info.level}</span>
-          <i className="xpbar" style={{ transform: `scaleX(${info.pct})` }} />
-        </button>
-        <button type="button" className="pill" onClick={() => open({ type: "sun" })}>
-          <IconSun />
-          <span className="num">{save.energy}</span>
-          <small>{save.energy >= cap ? "Full" : formatLeft(wait)}</small>
-        </button>
-        <button type="button" className="pill" data-testid="daily-gift" onClick={() => daily()}>
-          {dailyReady ? "Daily gift" : "Tomorrow"}
-        </button>
-        <button type="button" className="pill" data-testid="watch-ad" onClick={() => watchAd()}>
-          Watch ad
-        </button>
-        <button type="button" className="pill pill-money" data-testid="open-shop" onClick={() => open({ type: "shop" })}>
-          <span className="coin"><IconCoin /><b className="num">{save.coins.toLocaleString("en-US")}</b></span>
-          <span className="stone"><IconStone /><b className="num">{save.stones}</b></span>
-        </button>
+        <div className="hud-row">
+          <button type="button" className="pill" onClick={() => open({ type: "level" })}>
+            <IconMoon />
+            <span className="num">{info.level}</span>
+            <i className="xpbar" style={{ transform: `scaleX(${info.pct})` }} />
+          </button>
+          <button type="button" className="pill" onClick={() => open({ type: "sun" })}>
+            <IconSun />
+            <span className="num">{save.energy}</span>
+            <small>{save.energy >= cap ? "Full" : formatLeft(wait)}</small>
+          </button>
+          <button type="button" className="pill" data-testid="daily-gift" onClick={() => daily()}>
+            <span>{dailyReady ? "🎁 Daily gift" : "🎁 Tomorrow"}</span>
+          </button>
+          <button type="button" className="pill" data-testid="watch-ad" onClick={() => setAsk(true)}>
+            Watch ad for rewards
+          </button>
+          <button type="button" className="pill" data-testid="open-shop-btn" onClick={() => open({ type: "shop" })}>
+            🏪 Shop
+          </button>
+        </div>
+        <div className="hud-row">
+          <button type="button" className="objchip" onClick={() => open({ type: "tasks" })}>
+            <span>{quest ? quest.title : "The cove is in season"}</span>
+            {quest ? <small className="num">{Math.min(quest.goal, quest.progress(save))}/{quest.goal}</small> : null}
+          </button>
+          <button type="button" className="pill pill-money" data-testid="open-shop" onClick={() => open({ type: "shop" })}>
+            <span className="coin"><IconCoin /><b className="num">{save.coins.toLocaleString("en-US")}</b></span>
+            <span className="stone"><IconStone /><b className="num">{save.stones}</b></span>
+          </button>
+        </div>
       </header>
-      <button type="button" className="objchip" onClick={() => open({ type: "tasks" })}>
-        <span>{quest ? quest.title : "The cove is in season"}</span>
-        {quest ? <small className="num">{Math.min(quest.goal, quest.progress(save))}/{quest.goal}</small> : null}
-      </button>
+      <TokenAsk open={ask} onClose={() => setAsk(false)} />
     </>
   )
 }

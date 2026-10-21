@@ -44,6 +44,8 @@ import {
   claimWelcome,
   claimDaily,
   grantRewarded,
+  adsUsedToday,
+  TOKEN_AD_LIMIT,
 } from "@/game/logic"
 import { showRewardedAd } from "@/game/ads"
 import { claimYard, settleYard, YARD_SELL } from "@/game/yard"
@@ -234,14 +236,25 @@ export const useGame = create<Store>()(
         doDaily: () => run(claimDaily(saveKeys(get()), Date.now()), "coin"),
         doWatchAd: () => {
           void (async () => {
-            const ad = await showRewardedAd()
             const now = Date.now()
-            if (!ad.completed) {
+            if (adsUsedToday(saveKeys(get()), now) >= TOKEN_AD_LIMIT) {
               audio.bad()
-              set((s) => ({ toasts: push(s.toasts, ad.reason ?? "Ad not ready.", now), now }))
+              set((s) => ({
+                toasts: push(s.toasts, "You've reached today's free token limit. Come back tomorrow or visit the Token Shop.", now),
+                now,
+              }))
               return
             }
-            run(grantRewarded(saveKeys(get()), now), "coin")
+            const ad = await showRewardedAd()
+            const done = Date.now()
+            if (!ad.completed) {
+              if (ad.reason) {
+                audio.bad()
+                set((s) => ({ toasts: push(s.toasts, ad.reason ?? "Ad closed.", done), now: done }))
+              }
+              return
+            }
+            run(grantRewarded(saveKeys(get()), done), "coin")
           })()
         },
       }

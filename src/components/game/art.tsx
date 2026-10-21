@@ -330,7 +330,6 @@ export function Ground() {
         <i className="cloud c2" />
         <i className="cloud c3" />
         <i className="shimmer" />
-        <i className="waves" />
         <span className="gull g1" />
         <span className="gull g2" />
       </div>
