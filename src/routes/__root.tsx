@@ -15,6 +15,7 @@ export const Route = createRootRoute({
       { name: "apple-mobile-web-app-title", content: APP_NAME },
       { name: "description", content: "Grow a Jamaican cove, press jam with Granny Marva, and age fruit wine in the dark." },
       { name: "theme-color", content: "#14302e" },
+      { name: "google-admob-app-id", content: "ca-app-pub-8801782508971606~5157227320" },
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/icons/icon-192.png?v=tree" },

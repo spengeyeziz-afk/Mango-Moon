@@ -5,7 +5,7 @@ import { Island } from "@/components/game/Island"
 import { AvatarPicker } from "@/components/game/portraits"
 import { Sheets, TokenAsk } from "@/components/game/Sheets"
 import { activeQuest, energyCap, formatLeft, levelInfo } from "@/game/content"
-import { initAds } from "@/game/ads"
+import { initAds, showInterstitial } from "@/game/ads"
 import { DAY_MS } from "@/game/logic"
 import { nextEnergyMs } from "@/game/logic"
 import { useGame } from "@/game/store"
@@ -165,12 +165,15 @@ function Hud() {
 function Dock() {
   const open = useGame((s) => s.open)
   const orders = useGame((s) => s.orders.length)
+  const go = (type: "orders" | "market" | "book") => {
+    void showInterstitial(type).then(() => open({ type }))
+  }
   return (
     <nav className="dock" aria-label="Cove">
       <button type="button" data-testid="dock-tasks" onClick={() => open({ type: "tasks" })}><ListChecks /><span>Tasks</span></button>
-      <button type="button" data-testid="dock-orders" onClick={() => open({ type: "orders" })}><Ship /><span>Orders</span>{orders > 0 ? <em>{orders}</em> : null}</button>
-      <button type="button" data-testid="dock-market" onClick={() => open({ type: "market" })}><Store /><span>Market</span></button>
-      <button type="button" data-testid="dock-book" onClick={() => open({ type: "book" })}><BookOpen /><span>Book</span></button>
+      <button type="button" data-testid="dock-orders" onClick={() => go("orders")}><Ship /><span>Orders</span>{orders > 0 ? <em>{orders}</em> : null}</button>
+      <button type="button" data-testid="dock-market" onClick={() => go("market")}><Store /><span>Market</span></button>
+      <button type="button" data-testid="dock-book" onClick={() => go("book")}><BookOpen /><span>Book</span></button>
       <button type="button" data-testid="dock-settings" onClick={() => open({ type: "settings" })}><Settings /><span>Settings</span></button>
     </nav>
   )

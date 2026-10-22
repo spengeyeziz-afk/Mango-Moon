@@ -867,7 +867,7 @@ export function claimDaily(save: Save, now: number): Act {
 }
 
 /** Only call after a rewarded ad actually finishes. Tokens are moonstones. */
-export const TOKEN_AD_REWARD = 50
+export const TOKEN_AD_REWARD = 10
 export const TOKEN_AD_LIMIT = 4
 const TOKEN_LIMIT = "You've reached today's free token limit. Come back tomorrow or visit the Token Shop."
 
@@ -890,7 +890,7 @@ export function grantTokenAd(save: Save, now: number): Act {
   if (s.adsToday >= TOKEN_AD_LIMIT) return { ok: false, reason: TOKEN_LIMIT }
   s.adsToday += 1
   s.stones += TOKEN_AD_REWARD
-  return { ok: true, save: s, note: "+50 Tokens earned! Enjoy your day." }
+  return { ok: true, save: s, note: "+10 Tokens earned! Enjoy your day." }
 }
 
 export function grantRewarded(save: Save, now: number): Act {

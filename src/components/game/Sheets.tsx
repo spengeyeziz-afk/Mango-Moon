@@ -505,7 +505,7 @@ export function TokenAsk({ open, onClose }: { open: boolean; onClose: () => void
     <div className="ask-layer" role="dialog" aria-labelledby="earn-title">
       <div className="ask-card">
         <h3 id="earn-title">Earn Free Tokens</h3>
-        <p>Watch a short video to receive 50 Tokens?</p>
+        <p>Watch a short video to earn 10 Tokens?</p>
         <div className="ask-actions">
           <button type="button" className="btn" onClick={onClose}>Cancel</button>
           <button
@@ -532,7 +532,7 @@ function Shop() {
       <h2>Moon stall</h2>
       <section className="earn-card">
         <h3>Earn Free Tokens</h3>
-        <p>Watch a short test ad for 50 tokens. {Math.max(0, 4 - used)} free today.</p>
+        <p>{Math.max(0, 4 - used)} free videos left today.</p>
         <button
           type="button"
           className="btn btn-primary"
@@ -545,7 +545,7 @@ function Shop() {
             setAsk(true)
           }}
         >
-          Watch Ad for Tokens
+          Watch Ad for 10 Tokens
         </button>
       </section>
       <TokenAsk open={ask} onClose={() => setAsk(false)} />
@@ -847,7 +847,7 @@ function Privacy() {
       <h2>Privacy policy</h2>
       <p>Mango Moon does not collect personal data by itself. Progress, settings, and the keeper you choose stay in this browser, on this device.</p>
       <p>The game does not ask for an account, and it does not send your orchard, coins, or moonstones to a server.</p>
-      <p>If ads are added later, a third-party network such as Google AdMob may collect device and advertising data under its own rules. No ads are loaded in this version.</p>
+      <p>Rewarded and full-screen ads are served by Google AdMob. Google may collect device and advertising data under its own rules.</p>
       <p>
         <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">Google advertising privacy policy</a>
       </p>
